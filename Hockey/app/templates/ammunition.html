@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center">Амуниция</h1>
+    <div class="row">
+        {% for good in goods %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    {% if good.good_image %}
+                    <img src="data:image/jpeg;base64,{{ good.good_image }}" alt="Profile Image" class="img-fluid rounded-start" style="max-width: 50%;">
+                {% endif %}
+
+                    <h5 class="card-title">{{ good.good_name }}</h5>
+                    <p class="card-text"><strong>{{ good.good_price }} р.</strong></p>
+                    {% if current_user.role_id == 2 %}
+                        <a href="{{ url_for('update_good', good_id=good.good_id) }}" class="btn btn-primary">Редактировать</a>
+                    {% else %}
+                        {% if good.good_amount > 0 %}
+                            <form action="{{ url_for('basket') }}" method="post">
+                                <div class="form-group">
+                                    <label for="quantity_{{ good.good_id }}">Количество:</label>
+                                    <input type="number" class="form-control" id="quantity_{{ good.good_id }}" name="quantity" min="1" value="1" required>
+                                </div>
+                                <input type="hidden" name="good_id" value="{{ good.good_id }}">
+                                <input type="hidden" name="price" value="{{ good.good_price }}">
+                                <input type="hidden" name="good_amount" value="{{ good.good_amount }}">
+                                <button type="submit" class="btn btn-success">Добавить в корзину</button>
+                            </form>
+                        {% else %}
+                            <p class="text-danger">Товар закончился</p>
+                        {% endif %}
+                    {% endif %}
+                    <a href="{{ url_for('more', good_id=good.good_id) }}" class="btn btn-info mt-2">Подробнее</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% from 'user_macros.html' import user_form %}
+    <div class="container">
+        <h2>Редактировать пользователя</h2>
+        {{ user_form(action='edit', user=user, errors=errors) }}
+    </div>
+{% endblock %}

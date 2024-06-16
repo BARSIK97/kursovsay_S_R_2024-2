@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center">{{ good.good_name }}</h1>
+    <div class="row">
+        {% if good.good_image %}
+        <img src="data:image/jpeg;base64,{{ good.good_image }}" alt="Profile Image" class="img-fluid rounded-start" style="max-width: 50%;">
+        {% endif %}
+        <div class="col-md-6">
+            <h2>Описание</h2>
+            <p>{{ good.good_description }}</p>
+            <p><strong>Цена: {{ good.good_price }} р.</strong></p>
+            <p class="text-right"><strong>Оставшиеся количество: {{ good.good_amount }}</strong></p>
+            <form action="{{ url_for('basket') }}" method="post">
+                <div class="form-group">
+                    <label for="quantity_{{ good.good_id }}">Количество:</label>
+                    <input type="number" class="form-control" id="quantity_{{ good.good_id }}" name="quantity" min="1" value="1" required>
+                </div>
+                <input type="hidden" name="good_id" value="{{ good.good_id }}">
+                <input type="hidden" name="price" value="{{ good.good_price }}">
+                {% if not current_user.role_id == 2 %}
+                <button type="submit" class="btn btn-success">Добавить в корзину</button>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

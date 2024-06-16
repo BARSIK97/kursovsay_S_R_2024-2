@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center">Оформление заказа</h1>
+    <form method="post">
+        <div class="row">
+            <div class="col-md-12">
+                <h2>Товары</h2>
+                <ul>
+                    {% for item in basket_items %}
+                    <li>{{ item.good_name }} - {{ item.amount }} шт.</li>
+                    {% endfor %}
+                </ul>
+                <h3>Общее количество товаров: {{ total_quantity }}</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <label for="delivery_id">Доставка:</label>
+                <select id="delivery_id" name="delivery_id" class="form-control">
+                    {% for option in delivery_options %}
+                    <option value="{{ option.delivery_id }}" data-price="{{ option.delivery_price }}">{{ option.delivery_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="delivery_price">Цена за доставку:</label>
+                <input type="text" id="delivery_price" name="delivery_price" class="form-control" readonly>
+            </div>
+            <div class="col-md-6">
+                <label for="address">Адрес доставки:</label>
+                <input type="text" id="address" name="address" class="form-control" required>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-12">
+                <h3>{{ discount_message }}</h3>
+                <h3>Итоговая цена: <span id="total_price">{{ total_price }}</span></h3>
+            </div>
+        </div> 
+        <div class="row mt-3">
+            <div class="col-md-12 text-center">
+                <button type="submit" class="btn btn-success">Оформить заказ</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.getElementById('delivery_id').addEventListener('change', function() {
+        var selectedOption = this.options[this.selectedIndex];
+        var deliveryPrice = parseFloat(selectedOption.getAttribute('data-price'));
+        var totalWithoutDelivery = parseFloat("{{ total_price }}");
+
+        // Установка цены за доставку в поле ввода
+        document.getElementById('delivery_price').value = deliveryPrice.toFixed(2) + ' р.';
+
+        var totalWithDelivery = totalWithoutDelivery + deliveryPrice;
+        document.getElementById('total_price').innerText = totalWithDelivery.toFixed(2) + ' р.';
+
+        // Установка адреса при выборе определенного метода доставки
+        var deliveryMethod = selectedOption.value;
+        if (deliveryMethod === '1') {
+            document.getElementById('address').setAttribute('readonly', true);
+            document.getElementById('address').value = "1-й Балтийский переулок 6/21";
+        } else {
+            document.getElementById('address').removeAttribute('readonly');
+            document.getElementById('address').value = "";
+        }
+    });</script>
+
+{% endblock %}

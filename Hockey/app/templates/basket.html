@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center">Корзина</h1>
+    {% if basket_items %}
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Товар</th>
+                        <th>Количество</th>
+                        <th>Цена за единицу</th>
+                        <th>Общая цена</th>
+                        <th>Действие</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in basket_items %}
+                    <tr>
+                        <td>{{ item.good_name }}</td>
+                        <td>{{ item.amount }}</td>
+                        <td>{{ item.price }} р.</td>
+                        <td>{{ item.amount * item.price }} р.</td>
+                        <td>
+                            <a href="{{ url_for('more', good_id=item.good_id) }}" class="btn btn-primary">Подробнее</a>
+                            <form action="{{ url_for('delete_from_basket', booking_id=item.booking_id) }}" method="post" style="display:inline-block;">
+                                <button type="submit" class="btn btn-danger">Удалить</button>
+                            </form>
+                        </td>        
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <form action="{{ url_for('make_ord') }}" method="get" class="text-center">
+                <button type="submit" class="btn btn-success">Оформить заказ</button>
+            </form>
+        </div>
+    </div>
+    {% else %}
+    <p class="text-center">Ваша корзина пуста.</p>
+    {% endif %}
+</div>
+{% endblock %}

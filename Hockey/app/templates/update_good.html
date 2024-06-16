@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center">Редактирование товара</h1>
+    <div class="row">
+        <div class="col-md-6">
+            <h2>Изменение данных</h2>
+            <form action="{{ url_for('update_good', good_id=good.good_id) }}" method="post" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label class="form-label" for="good_image">Профильное изображение</label>
+                    <input class="form-control" type="file" id="good_image" name="good_image">
+                </div>
+                <div class="form-group">
+                    <label for="good_name">Наименование товара:</label>
+                    <input type="text" class="form-control" id="good_name" name="good_name" value="{{ good.good_name }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="good_description">Описание товара:</label>
+                    <textarea class="form-control" id="good_description" name="good_description" rows="4" required>{{ good.good_description }}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="good_price">Цена (руб.):</label>
+                    <input type="number" class="form-control" id="good_price" name="good_price" min="0" step="0.01" value="{{ good.good_price }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="good_amount">Оставшееся количество:</label>
+                    <input type="number" class="form-control" id="good_amount" name="good_amount" min="0" value="{{ good.good_amount }}" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
