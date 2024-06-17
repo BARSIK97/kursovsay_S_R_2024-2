@@ -1,5 +1,5 @@
 import datetime
-from flask import Flask, render_template, session, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import (
     LoginManager,
     UserMixin,
@@ -71,9 +71,7 @@ def load_user(user_id):
         user = cursor.fetchone()
 
     if user:
-        return User(
-            user.user_id, user.login, user.role_id
-        )  # Используем имена атрибутов
+        return User(user.user_id, user.login, user.role_id)
     return None
 
 
@@ -113,16 +111,17 @@ def auth():
 @login_required
 def users():
     query = "SELECT users.* FROM users WHERE user_id=%s"
-    
+
     with db_connector.connect().cursor(named_tuple=True) as cursor:
         cursor.execute(query, (current_user.id,))
         user = cursor.fetchone()
-    
-    user_dict = dict(user._asdict())  # Преобразуем namedtuple в словарь
+
+    user_dict = dict(user._asdict())
     if user.user_image:
         user_dict["user_image"] = base64.b64encode(user.user_image).decode("utf-8")
-    
+
     return render_template("account.html", user=user_dict)
+
 
 def get_form_data(required_fields):
     user = {}
@@ -179,13 +178,12 @@ def reg():
 @app.route("/account/<int:user_id>/edit_user", methods=["GET", "POST"])
 @login_required
 def edit_user(user_id):
-    query = ("SELECT * FROM users where user_id = %s")
+    query = "SELECT * FROM users where user_id = %s"
     with db_connector.connect().cursor(named_tuple=True) as cursor:
-        cursor.execute(query, (user_id, ))
+        cursor.execute(query, (user_id,))
         user = cursor.fetchone()
-    
+
     errors = None
-    print(user_id)
     if request.method == "POST":
         updated_user = get_form_data(
             [
@@ -198,7 +196,7 @@ def edit_user(user_id):
                 "password",
             ]
         )
-        print(updated_user)
+
         errors = validate_user_data(updated_user)
 
         if not errors:
@@ -207,8 +205,8 @@ def edit_user(user_id):
                 file = request.files["user_image"]
                 if file and file.filename != "":
                     user_image = file.read()
-            updated_user['user_id'] = user_id
-            updated_user['user_image'] = user_image
+            updated_user["user_id"] = user_id
+            updated_user["user_image"] = user_image
             query = """
             UPDATE users SET last_name=%(last_name)s, first_name=%(first_name)s, middle_name=%(middle_name)s,
                             phone=%(phone)s, email=%(email)s, user_image=%(user_image)s
@@ -255,24 +253,25 @@ def validate_user_data(user):
 
     return errors
 
-import base64
+
 @app.route("/ammunition")
 @login_required
 def ammunition():
     query = "SELECT * FROM goods"
-    
+
     with db_connector.connect().cursor(named_tuple=True) as cursor:
         cursor.execute(query)
         goods = cursor.fetchall()
-    
+
     good_data = []
     for good in goods:
         good_dict = dict(good._asdict())
         if good.good_image:
-            good_dict['good_image'] = base64.b64encode(good.good_image).decode('utf-8')
+            good_dict["good_image"] = base64.b64encode(good.good_image).decode("utf-8")
         good_data.append(good_dict)
-    
+
     return render_template("ammunition.html", goods=good_data)
+
 
 @app.route("/ammunition/<int:good_id>")
 @login_required
@@ -281,11 +280,11 @@ def more(good_id):
     with db_connector.connect().cursor(named_tuple=True) as cursor:
         cursor.execute(query, (good_id,))
         good = cursor.fetchone()
-    
+
     good_dict = dict(good._asdict())
     if good.good_image:
-        good_dict['good_image'] = base64.b64encode(good.good_image).decode('utf-8')
-    
+        good_dict["good_image"] = base64.b64encode(good.good_image).decode("utf-8")
+
     return render_template("more.html", good=good_dict)
 
 
@@ -539,23 +538,6 @@ def account():
     return render_template("account.html", user=user, errors=errors)
 
 
-@app.route("/delete_user/<int:user_id>", methods=["POST"])
-@login_required
-def delete_user(user_id):
-    query = "DELETE FROM users WHERE user_id=%s"
-    try:
-        with db_connector.connect().cursor(named_tuple=True) as cursor:
-            cursor.execute(query, (user_id,))
-            db_connector.connect().commit()
-            logout_user()
-            flash("Ваш аккаунт был удален", category="success")
-            return redirect(url_for("index"))
-    except DatabaseError as error:
-        flash(f"Ошибка удаления пользователя: {error}", category="danger")
-        db_connector.connect().rollback()
-        return redirect(url_for("account"))
-
-
 @app.route("/my_ord")
 @login_required
 def my_ord():
@@ -688,9 +670,6 @@ def validate_password(password):
     return errors
 
 
-
-
-
 @app.route("/update_good/<int:good_id>", methods=["GET", "POST"])
 @login_required
 def update_good(good_id):
@@ -698,17 +677,17 @@ def update_good(good_id):
     with db_connector.connect().cursor(named_tuple=True) as cursor:
         cursor.execute(query, (good_id,))
         good = cursor.fetchone()
-    
+
     if request.method == "POST":
         good_name = request.form.get("good_name")
         good_description = request.form.get("good_description")
         good_price = request.form.get("good_price")
         good_amount = request.form.get("good_amount")
         good_image = None
-        
-        if 'good_image' in request.files:
-            file = request.files['good_image']
-            if file and file.filename != '':
+
+        if "good_image" in request.files:
+            file = request.files["good_image"]
+            if file and file.filename != "":
                 good_image = file.read()
         good_image = good_image
         query = """
@@ -716,12 +695,19 @@ def update_good(good_id):
         SET good_name=%s, good_description=%s, good_price=%s, good_amount=%s, good_image=%s
         WHERE good_id=%s
         """
-        
+
         try:
             with db_connector.connect().cursor() as cursor:
                 cursor.execute(
                     query,
-                    (good_name, good_description, good_price, good_amount, good_image, good_id)
+                    (
+                        good_name,
+                        good_description,
+                        good_price,
+                        good_amount,
+                        good_image,
+                        good_id,
+                    ),
                 )
                 db_connector.connect().commit()
                 flash("Изменения сохранены", category="success")
@@ -732,6 +718,7 @@ def update_good(good_id):
     else:
         return render_template("update_good.html", good=good)
     return redirect(url_for("ammunition"))
+
 
 @app.route("/logout")
 def logout():

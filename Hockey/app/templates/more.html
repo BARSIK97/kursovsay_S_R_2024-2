@@ -11,7 +11,7 @@
             <h2>Описание</h2>
             <p>{{ good.good_description }}</p>
             <p><strong>Цена: {{ good.good_price }} р.</strong></p>
-            <p class="text-right"><strong>Оставшиеся количество: {{ good.good_amount }}</strong></p>
+            <p class="text-right"><strong>Оставшееся количество: {{ good.good_amount }}</strong></p>
             <form action="{{ url_for('basket') }}" method="post">
                 <div class="form-group">
                     <label for="quantity_{{ good.good_id }}">Количество:</label>
@@ -20,7 +20,7 @@
                 <input type="hidden" name="good_id" value="{{ good.good_id }}">
                 <input type="hidden" name="price" value="{{ good.good_price }}">
                 {% if not current_user.role_id == 2 %}
-                <button type="submit" class="btn btn-success">Добавить в корзину</button>
+                <button type="submit" class="btn btn-success mt-2">Добавить в корзину</button>
                 {% endif %}
             </form>
         </div>

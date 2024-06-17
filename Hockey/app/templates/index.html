@@ -2,5 +2,10 @@
 
 {% block content %}
     <h1 class="text-center">Хоккейный магазин</h1>
-    <h2 class="text-center">H.S</h2>
+    <div class="text-center mt-4">
+        <img src="{{ url_for('static', filename='images/main.png') }}" alt="Хоккейный магазин" class="img-fluid" style="max-width: 50%;">
+        <p class="mt-4 text-center">Добро пожаловать в наш хоккейный магазин! 
+            <br>У нас вы найдете все необходимое для занятий хоккеем: от клюшек и коньков до защитного снаряжения и аксессуаров. 
+            <br>Мы предлагаем товары только от проверенных производителей, чтобы вы могли быть уверены в их качестве и надежности.</p>
+    </div>
 {% endblock content %}
